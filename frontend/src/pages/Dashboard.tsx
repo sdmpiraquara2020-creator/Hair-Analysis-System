@@ -5,16 +5,43 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { historico } = useAnalysisHistory();
 
+  const totalAnalises = historico.length;
+
   return (
     <section style={{ padding: 32, maxWidth: 1200 }}>
       {/* Cabeçalho */}
-      <header style={{ marginBottom: 32 }}>
+      <header style={{ marginBottom: 24 }}>
         <h1>Dashboard</h1>
         <p style={{ color: "#6b7280", maxWidth: 720 }}>
           Painel de acompanhamento do Hair Analysis System. Inicie novas análises
           e acompanhe avaliações recentes realizadas no salão.
         </p>
       </header>
+
+      {/* Cliente ativo (fase 2 – em memória) */}
+      <div
+        style={{
+          border: "1px solid #e5e7eb",
+          borderRadius: 12,
+          padding: 20,
+          background: "#ffffff",
+          marginBottom: 32,
+          maxWidth: 720,
+        }}
+      >
+        <strong>Cliente ativo na sessão</strong>
+        <p style={{ color: "#6b7280", marginTop: 6 }}>
+          Atendimento em andamento sem persistência. As análises realizadas nesta
+          sessão estão vinculadas a uma única cliente em memória.
+        </p>
+
+        <p style={{ marginTop: 12 }}>
+          <strong>Análises realizadas:</strong>{" "}
+          {totalAnalises === 0
+            ? "nenhuma até o momento"
+            : totalAnalises}
+        </p>
+      </div>
 
       {/* Ações principais */}
       <div

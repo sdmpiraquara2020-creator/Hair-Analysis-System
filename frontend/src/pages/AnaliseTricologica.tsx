@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAnalysisHistory } from "../context/AnalysisHistoryContext";
+import { useCliente } from "../context/ClienteContext";
 
 type Oleosidade = "normal" | "oleoso" | "seco";
 type Descamacao = "nao" | "leve" | "moderada";
@@ -19,6 +20,7 @@ type ResultadoTricologico = {
 export default function AnaliseTricologica() {
   const navigate = useNavigate();
   const { adicionarRegistro } = useAnalysisHistory();
+  const { cliente, criarCliente, adicionarAnaliseAoCliente } = useCliente();
 
   const [oleosidade, setOleosidade] = useState<Oleosidade | "">("");
   const [descamacao, setDescamacao] = useState<Descamacao | "">("");
@@ -27,7 +29,8 @@ export default function AnaliseTricologica() {
   const [queda, setQueda] = useState<Queda | "">("");
   const [observacoes, setObservacoes] = useState("");
 
-  const [resultado, setResultado] = useState<ResultadoTricologico | null>(null);
+  const [resultado, setResultado] =
+    useState<ResultadoTricologico | null>(null);
 
   function gerarResultado(): ResultadoTricologico {
     const pontosObservados: string[] = [];
@@ -93,12 +96,26 @@ export default function AnaliseTricologica() {
     const resultadoGerado = gerarResultado();
     setResultado(resultadoGerado);
 
-    // Registro obrigatório no histórico global
+    // Registro global (inalterado)
     adicionarRegistro({
       tipo: "tricológica",
       data: new Date().toLocaleString("pt-BR"),
       descricao:
         "Análise tricológica realizada para avaliação da saúde do couro cabeludo e segurança em procedimentos.",
+    });
+
+    // Garantir cliente ativo
+    if (!cliente) {
+      criarCliente();
+    }
+
+    // Registro vinculado ao cliente ativo
+    adicionarAnaliseAoCliente({
+      id: crypto.randomUUID(),
+      tipo: "tricológica",
+      data: new Date().toLocaleString("pt-BR"),
+      descricao:
+        "Análise tricológica vinculada ao atendimento da cliente.",
     });
   }
 

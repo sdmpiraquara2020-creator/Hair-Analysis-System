@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAnalysisHistory } from "../context/AnalysisHistoryContext";
+import { useCliente } from "../context/ClienteContext";
 
 type ResultadoCapilar = {
   resumoTecnico: string;
@@ -12,6 +13,7 @@ type ResultadoCapilar = {
 export default function AnaliseCapilar() {
   const navigate = useNavigate();
   const { adicionarRegistro } = useAnalysisHistory();
+  const { cliente, criarCliente, adicionarAnaliseAoCliente } = useCliente();
 
   const [resultado, setResultado] = useState<ResultadoCapilar | null>(null);
 
@@ -34,12 +36,26 @@ export default function AnaliseCapilar() {
 
     setResultado(resultadoGerado);
 
-    // Registro obrigatório no histórico global
+    // Registro global (inalterado)
     adicionarRegistro({
       tipo: "capilar",
       data: new Date().toLocaleString("pt-BR"),
       descricao:
         "Análise capilar realizada para avaliação da saúde do fio e definição de cuidados estéticos.",
+    });
+
+    // Garantir cliente ativo em memória
+    if (!cliente) {
+      criarCliente();
+    }
+
+    // Registro vinculado ao cliente ativo
+    adicionarAnaliseAoCliente({
+      id: crypto.randomUUID(),
+      tipo: "capilar",
+      data: new Date().toLocaleString("pt-BR"),
+      descricao:
+        "Análise capilar vinculada ao atendimento da cliente.",
     });
   }
 
