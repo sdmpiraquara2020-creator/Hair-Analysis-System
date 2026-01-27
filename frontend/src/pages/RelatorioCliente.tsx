@@ -1,6 +1,12 @@
 import { useCliente } from "../context/ClienteContext";
 import { useNavigate } from "react-router-dom";
 
+type Protocolo = {
+  titulo: string;
+  descricao: string;
+  indicacoes: string[];
+};
+
 export default function RelatorioCliente() {
   const { cliente } = useCliente();
   const navigate = useNavigate();
@@ -33,6 +39,84 @@ export default function RelatorioCliente() {
 
   const analises = cliente.analises;
 
+  // ===== Protocolos Inteligentes =====
+  function gerarProtocolos(): Protocolo[] {
+    const protocolos: Protocolo[] = [];
+
+    const possuiCapilar = analises.some((a) => a.tipo === "capilar");
+    const possuiTrico = analises.some((a) => a.tipo === "tricológica");
+    const totalAnalises = analises.length;
+
+    if (possuiTrico) {
+      protocolos.push({
+        titulo: "Protocolo de Saúde do Couro Cabeludo",
+        descricao:
+          "Indicado quando há avaliação tricológica registrada, priorizando segurança e equilíbrio antes de procedimentos químicos.",
+        indicacoes: [
+          "Tratamentos calmantes e equilibrantes",
+          "Controle de oleosidade e sensibilidade",
+          "Preparação do couro cabeludo antes de químicas",
+        ],
+      });
+    }
+
+    if (possuiCapilar && !possuiTrico) {
+      protocolos.push({
+        titulo: "Protocolo de Procedimento Capilar Seguro",
+        descricao:
+          "Indicado quando a análise capilar demonstra condições compatíveis com procedimentos estéticos.",
+        indicacoes: [
+          "Alisamentos compatíveis com o histórico do fio",
+          "Tratamentos de nutrição e manutenção",
+          "Plano de cuidados pós-procedimento",
+        ],
+      });
+    }
+
+    if (possuiCapilar && possuiTrico) {
+      protocolos.push({
+        titulo: "Protocolo Combinado Saúde + Procedimento",
+        descricao:
+          "Combinação de cuidados do couro cabeludo com procedimentos capilares, garantindo segurança e melhor performance dos resultados.",
+        indicacoes: [
+          "Tratamento prévio de saúde do couro cabeludo",
+          "Procedimentos capilares progressivos ou alinhamentos",
+          "Manutenção periódica personalizada",
+        ],
+      });
+    }
+
+    if (totalAnalises >= 2) {
+      protocolos.push({
+        titulo: "Protocolo de Acompanhamento Contínuo",
+        descricao:
+          "Indicado para clientes em acompanhamento, visando evolução gradual e previsibilidade de resultados.",
+        indicacoes: [
+          "Pacote de tratamentos periódicos",
+          "Reavaliações técnicas programadas",
+          "Plano de fidelização com foco em saúde e estética",
+        ],
+      });
+    }
+
+    if (protocolos.length === 0) {
+      protocolos.push({
+        titulo: "Protocolo Preventivo",
+        descricao:
+          "Indicado quando não há pontos críticos registrados, focando na manutenção da saúde capilar.",
+        indicacoes: [
+          "Manutenção preventiva",
+          "Cuidados domiciliares orientados",
+          "Reavaliação periódica",
+        ],
+      });
+    }
+
+    return protocolos;
+  }
+
+  const protocolosGerados = gerarProtocolos();
+
   return (
     <section style={{ maxWidth: 1000, margin: "0 auto", padding: 32 }}>
       <header style={{ marginBottom: 32 }}>
@@ -63,7 +147,7 @@ export default function RelatorioCliente() {
         </p>
       </div>
 
-      {/* Histórico de análises */}
+      {/* Histórico */}
       <section style={{ marginBottom: 40 }}>
         <h2>Histórico de Análises</h2>
 
@@ -96,42 +180,37 @@ export default function RelatorioCliente() {
         )}
       </section>
 
-      {/* Protocolos recomendados (estáticos, fase 4.1) */}
+      {/* Protocolos Inteligentes */}
       <section>
-        <h2>Protocolos Estéticos Recomendados</h2>
+        <h2>Protocolos Personalizados Recomendados</h2>
 
-        <div
-          style={{
-            marginTop: 16,
-            border: "1px solid #e5e7eb",
-            borderRadius: 12,
-            padding: 20,
-            background: "#ffffff",
-          }}
-        >
-          <ul>
-            <li>
-              Avaliar necessidade de tratamentos de reconstrução ou nutrição
-              antes de procedimentos químicos.
-            </li>
-            <li>
-              Priorizar protocolos de manutenção para preservação da saúde do
-              fio.
-            </li>
-            <li>
-              Procedimentos de alisamento devem respeitar o histórico capilar e
-              tricológico registrado.
-            </li>
-            <li>
-              Recomenda-se acompanhamento periódico para evolução segura.
-            </li>
-          </ul>
+        <div style={{ display: "grid", gap: 20, marginTop: 16 }}>
+          {protocolosGerados.map((protocolo, index) => (
+            <div
+              key={index}
+              style={{
+                border: "1px solid #e5e7eb",
+                borderRadius: 12,
+                padding: 20,
+                background: "#ffffff",
+              }}
+            >
+              <h3>{protocolo.titulo}</h3>
+              <p style={{ marginTop: 8 }}>{protocolo.descricao}</p>
 
-          <p style={{ fontSize: 12, color: "#6b7280", marginTop: 16 }}>
-            Protocolos sugeridos com base nas análises estéticas realizadas.
-            Decisão final cabe ao profissional responsável.
-          </p>
+              <ul style={{ marginTop: 12 }}>
+                {protocolo.indicacoes.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
+
+        <p style={{ fontSize: 12, color: "#6b7280", marginTop: 16 }}>
+          Protocolos sugeridos com base no histórico técnico-estético da cliente.
+          A decisão final cabe ao profissional responsável.
+        </p>
       </section>
 
       <div style={{ marginTop: 40 }}>
