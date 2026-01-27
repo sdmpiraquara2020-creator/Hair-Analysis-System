@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useAnalysisHistory } from "../context/AnalysisHistoryContext";
+import { useCliente } from "../context/ClienteContext";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { historico } = useAnalysisHistory();
+  const { cliente } = useCliente();
 
   const totalAnalises = historico.length;
 
@@ -18,7 +20,7 @@ export default function Dashboard() {
         </p>
       </header>
 
-      {/* Cliente ativo (fase 2 – em memória) */}
+      {/* Cliente ativo */}
       <div
         style={{
           border: "1px solid #e5e7eb",
@@ -29,18 +31,37 @@ export default function Dashboard() {
           maxWidth: 720,
         }}
       >
-        <strong>Cliente ativo na sessão</strong>
+        <strong>Cliente ativa na sessão</strong>
         <p style={{ color: "#6b7280", marginTop: 6 }}>
-          Atendimento em andamento sem persistência. As análises realizadas nesta
-          sessão estão vinculadas a uma única cliente em memória.
+          Atendimento em andamento com histórico vinculado à cliente atual.
         </p>
 
         <p style={{ marginTop: 12 }}>
           <strong>Análises realizadas:</strong>{" "}
-          {totalAnalises === 0
-            ? "nenhuma até o momento"
-            : totalAnalises}
+          {totalAnalises === 0 ? "nenhuma até o momento" : totalAnalises}
         </p>
+
+        <button
+          onClick={() => navigate("/relatorio-cliente")}
+          disabled={!cliente}
+          style={{
+            marginTop: 16,
+            padding: "10px 18px",
+            borderRadius: 8,
+            border: "none",
+            background: cliente ? "#047857" : "#9ca3af",
+            color: "#ffffff",
+            cursor: cliente ? "pointer" : "not-allowed",
+          }}
+        >
+          Ver relatório da cliente
+        </button>
+
+        {!cliente && (
+          <p style={{ fontSize: 12, color: "#6b7280", marginTop: 8 }}>
+            O relatório estará disponível após a realização de uma análise.
+          </p>
+        )}
       </div>
 
       {/* Ações principais */}
