@@ -1,7 +1,7 @@
 import { useCliente } from "../context/ClienteContext";
 import { useNavigate } from "react-router-dom";
 import html2pdf from "html2pdf.js";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 type Protocolo = {
   titulo: string;
@@ -13,6 +13,10 @@ export default function RelatorioCliente() {
   const { cliente } = useCliente();
   const navigate = useNavigate();
   const pdfRef = useRef<HTMLDivElement>(null);
+
+  const [profissional, setProfissional] = useState("");
+  const [clienteNome, setClienteNome] = useState("");
+  const [aceite, setAceite] = useState(false);
 
   if (!cliente) {
     return (
@@ -36,7 +40,7 @@ export default function RelatorioCliente() {
     if (possuiTrico) {
       protocolos.push({
         titulo: "Protocolo de Saúde do Couro Cabeludo",
-        descricao: "Equilíbrio e segurança antes de procedimentos químicos.",
+        descricao: "Equilíbrio do couro cabeludo antes de procedimentos químicos.",
         indicacoes: [
           "Tratamentos calmantes",
           "Controle de oleosidade",
@@ -50,7 +54,7 @@ export default function RelatorioCliente() {
         titulo: "Protocolo Capilar Personalizado",
         descricao: "Procedimentos compatíveis com o histórico do fio.",
         indicacoes: [
-          "Tratamentos de nutrição/reconstrução",
+          "Nutrição ou reconstrução",
           "Alisamentos compatíveis",
           "Manutenção periódica",
         ],
@@ -62,6 +66,10 @@ export default function RelatorioCliente() {
 
   function exportarPDF() {
     if (!pdfRef.current) return;
+    if (!aceite || !profissional || !clienteNome) {
+      alert("Preencha os nomes e confirme o aceite antes de exportar o PDF.");
+      return;
+    }
 
     html2pdf()
       .set({
@@ -76,13 +84,14 @@ export default function RelatorioCliente() {
   }
 
   const protocolos = gerarProtocolos();
+  const data = new Date().toLocaleDateString();
 
   return (
     <section style={styles.page}>
-      {/* AÇÕES (NÃO VAI PARA O PDF) */}
+      {/* AÇÕES */}
       <div style={styles.actions}>
         <button onClick={exportarPDF} style={styles.primaryBtn}>
-          Exportar PDF
+          Exportar PDF com Assinatura
         </button>
         <button onClick={() => navigate("/dashboard")} style={styles.secondaryBtn}>
           Voltar
@@ -101,7 +110,7 @@ export default function RelatorioCliente() {
         <section style={styles.section}>
           <h2>Identificação</h2>
           <p><strong>ID:</strong> {cliente.id}</p>
-          <p><strong>Início:</strong> {cliente.criadoEm}</p>
+          <p><strong>Data:</strong> {data}</p>
           <p><strong>Total de análises:</strong> {analises.length}</p>
         </section>
 
@@ -129,9 +138,45 @@ export default function RelatorioCliente() {
               </ul>
             </div>
           ))}
+        </section>
+
+        {/* ASSINATURAS */}
+        <section style={styles.section}>
+          <h2>Aceite e Assinaturas</h2>
+
           <p style={styles.disclaimer}>
-            Recomendações técnico-estéticas. Decisão final do profissional.
+            Declaro que recebi as orientações acima e estou ciente de que este
+            relatório possui caráter técnico-estético, não clínico.
           </p>
+
+          <div style={styles.signatureBlock}>
+            <div>
+              <label>Nome do Profissional</label>
+              <input
+                value={profissional}
+                onChange={(e) => setProfissional(e.target.value)}
+                style={styles.input}
+              />
+            </div>
+
+            <div>
+              <label>Nome da Cliente</label>
+              <input
+                value={clienteNome}
+                onChange={(e) => setClienteNome(e.target.value)}
+                style={styles.input}
+              />
+            </div>
+
+            <label style={styles.checkbox}>
+              <input
+                type="checkbox"
+                checked={aceite}
+                onChange={(e) => setAceite(e.target.checked)}
+              />
+              Confirmo o aceite das orientações acima
+            </label>
+          </div>
         </section>
 
         <footer style={styles.footer}>
@@ -144,7 +189,7 @@ export default function RelatorioCliente() {
   );
 }
 
-/* ===== Estilos ===== */
+/* ===== ESTILOS ===== */
 const styles: Record<string, React.CSSProperties> = {
   page: { maxWidth: 900, margin: "0 auto", padding: 32 },
   header: { borderBottom: "2px solid #e5e7eb", marginBottom: 20 },
@@ -172,8 +217,18 @@ const styles: Record<string, React.CSSProperties> = {
     background: "#fff",
     cursor: "pointer",
   },
+  input: {
+    width: "100%",
+    padding: 8,
+    marginTop: 4,
+    marginBottom: 12,
+    borderRadius: 4,
+    border: "1px solid #d1d5db",
+  },
+  checkbox: { display: "flex", gap: 8, alignItems: "center" },
+  signatureBlock: { marginTop: 16 },
   muted: { color: "#6b7280" },
   small: { fontSize: 12, color: "#6b7280" },
-  disclaimer: { fontSize: 12, color: "#6b7280", marginTop: 12 },
+  disclaimer: { fontSize: 13, marginBottom: 12 },
   footer: { borderTop: "1px solid #e5e7eb", paddingTop: 12, marginTop: 24 },
 };
