@@ -1,0 +1,45 @@
+.dashboard-cliente {
+  padding: 24px;
+}
+
+.cliente-header h1 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.cliente-header p {
+  margin-top: 4px;
+  color: #6b7280;
+}
+
+.cliente-cards {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.card {
+  background: #111827;
+  color: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  min-height: 100px;
+}
+
+.cliente-graficos {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.grafico {
+  background: #f3f4f6;
+  border-radius: 14px;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+}

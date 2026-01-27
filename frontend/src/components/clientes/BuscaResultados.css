@@ -1,0 +1,32 @@
+.busca-resultados {
+  position: absolute;
+  top: 56px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 420px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.resultado-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.resultado-item:hover {
+  background: #f5f7fa;
+}
+
+.resultado-item span {
+  display: block;
+  font-size: 13px;
+  color: #555;
+}
+
+.resultado-item small {
+  color: #999;
+}

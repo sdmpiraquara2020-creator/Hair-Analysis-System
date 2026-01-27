@@ -1,0 +1,106 @@
+/* ===== Layout base do sistema ===== */
+.layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.layout > main {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.app-page {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.sidebar {
+  width: 200px;
+  min-width: 200px;
+  flex-shrink: 0;
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding: 16px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 8px 12px;
+  color: #111827;
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+.sidebar a:hover {
+  background-color: #f3f4f6;
+}
+
+.sidebar a.active {
+  background-color: #f3f4f6;
+  border-left: 3px solid var(--color-primary);
+}
+
+/* ===== Listagem de clientes ===== */
+
+.clientes-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px 0 24px;
+}
+
+.cliente-row {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.cliente-info strong {
+  display: block;
+  font-size: 16px;
+  color: #111827;
+}
+
+.cliente-info span {
+  display: block;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* ===== Logo do Sidebar ===== */
+
+.sidebar-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.sidebar-logo-img {
+  max-width: 120px;
+  width: 100%;
+  height: auto;
+}
