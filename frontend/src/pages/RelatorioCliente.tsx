@@ -13,24 +13,13 @@ export default function RelatorioCliente() {
 
   if (!cliente) {
     return (
-      <section style={{ maxWidth: 900, margin: "0 auto", padding: 32 }}>
+      <section style={styles.page}>
         <h1>Relatório da Cliente</h1>
-        <p style={{ color: "#6b7280", marginTop: 12 }}>
+        <p style={styles.muted}>
           Nenhuma cliente ativa encontrada nesta sessão.
         </p>
 
-        <button
-          onClick={() => navigate("/dashboard")}
-          style={{
-            marginTop: 24,
-            padding: "10px 18px",
-            borderRadius: 8,
-            border: "none",
-            background: "#000080",
-            color: "#ffffff",
-            cursor: "pointer",
-          }}
-        >
+        <button onClick={() => navigate("/dashboard")} style={styles.primaryBtn}>
           Voltar ao Dashboard
         </button>
       </section>
@@ -39,10 +28,8 @@ export default function RelatorioCliente() {
 
   const analises = cliente.analises;
 
-  // ===== Protocolos Inteligentes =====
   function gerarProtocolos(): Protocolo[] {
     const protocolos: Protocolo[] = [];
-
     const possuiCapilar = analises.some((a) => a.tipo === "capilar");
     const possuiTrico = analises.some((a) => a.tipo === "tricológica");
     const totalAnalises = analises.length;
@@ -51,11 +38,11 @@ export default function RelatorioCliente() {
       protocolos.push({
         titulo: "Protocolo de Saúde do Couro Cabeludo",
         descricao:
-          "Indicado quando há avaliação tricológica registrada, priorizando segurança e equilíbrio antes de procedimentos químicos.",
+          "Prioriza equilíbrio e segurança do couro cabeludo antes de procedimentos químicos.",
         indicacoes: [
           "Tratamentos calmantes e equilibrantes",
           "Controle de oleosidade e sensibilidade",
-          "Preparação do couro cabeludo antes de químicas",
+          "Preparação pré-química",
         ],
       });
     }
@@ -64,11 +51,11 @@ export default function RelatorioCliente() {
       protocolos.push({
         titulo: "Protocolo de Procedimento Capilar Seguro",
         descricao:
-          "Indicado quando a análise capilar demonstra condições compatíveis com procedimentos estéticos.",
+          "Indicado quando a análise capilar aponta compatibilidade estética para procedimentos.",
         indicacoes: [
           "Alisamentos compatíveis com o histórico do fio",
-          "Tratamentos de nutrição e manutenção",
-          "Plano de cuidados pós-procedimento",
+          "Nutrição e manutenção",
+          "Cuidados pós-procedimento",
         ],
       });
     }
@@ -77,11 +64,11 @@ export default function RelatorioCliente() {
       protocolos.push({
         titulo: "Protocolo Combinado Saúde + Procedimento",
         descricao:
-          "Combinação de cuidados do couro cabeludo com procedimentos capilares, garantindo segurança e melhor performance dos resultados.",
+          "Integra cuidados do couro cabeludo com procedimentos capilares para maior segurança.",
         indicacoes: [
-          "Tratamento prévio de saúde do couro cabeludo",
-          "Procedimentos capilares progressivos ou alinhamentos",
-          "Manutenção periódica personalizada",
+          "Tratamento prévio do couro cabeludo",
+          "Procedimentos capilares progressivos",
+          "Manutenção personalizada",
         ],
       });
     }
@@ -90,11 +77,11 @@ export default function RelatorioCliente() {
       protocolos.push({
         titulo: "Protocolo de Acompanhamento Contínuo",
         descricao:
-          "Indicado para clientes em acompanhamento, visando evolução gradual e previsibilidade de resultados.",
+          "Focado em evolução gradual e previsibilidade de resultados.",
         indicacoes: [
           "Pacote de tratamentos periódicos",
           "Reavaliações técnicas programadas",
-          "Plano de fidelização com foco em saúde e estética",
+          "Plano de fidelização",
         ],
       });
     }
@@ -103,11 +90,11 @@ export default function RelatorioCliente() {
       protocolos.push({
         titulo: "Protocolo Preventivo",
         descricao:
-          "Indicado quando não há pontos críticos registrados, focando na manutenção da saúde capilar.",
+          "Manutenção da saúde capilar com foco preventivo.",
         indicacoes: [
-          "Manutenção preventiva",
           "Cuidados domiciliares orientados",
-          "Reavaliação periódica",
+          "Manutenção periódica",
+          "Reavaliação técnica",
         ],
       });
     }
@@ -118,116 +105,132 @@ export default function RelatorioCliente() {
   const protocolosGerados = gerarProtocolos();
 
   return (
-    <section style={{ maxWidth: 1000, margin: "0 auto", padding: 32 }}>
-      <header style={{ marginBottom: 32 }}>
-        <h1>Relatório Técnico da Cliente</h1>
-        <p style={{ color: "#6b7280", marginTop: 8 }}>
-          Documento técnico-estético de acompanhamento capilar e tricológico.
+    <section style={styles.page}>
+      {/* Cabeçalho do relatório */}
+      <header style={styles.header}>
+        <h1 style={styles.title}>Relatório Técnico da Cliente</h1>
+        <p style={styles.subtitle}>
+          Documento técnico-estético de acompanhamento capilar e tricológico
         </p>
       </header>
 
       {/* Dados da cliente */}
-      <div
-        style={{
-          border: "1px solid #e5e7eb",
-          borderRadius: 12,
-          padding: 20,
-          background: "#ffffff",
-          marginBottom: 32,
-        }}
-      >
-        <p>
-          <strong>ID da cliente:</strong> {cliente.id}
-        </p>
-        <p>
-          <strong>Início do atendimento:</strong> {cliente.criadoEm}
-        </p>
-        <p>
-          <strong>Total de análises:</strong> {analises.length}
-        </p>
-      </div>
+      <section style={styles.section}>
+        <h2 style={styles.sectionTitle}>Identificação</h2>
+        <div style={styles.card}>
+          <p><strong>ID da cliente:</strong> {cliente.id}</p>
+          <p><strong>Início do atendimento:</strong> {cliente.criadoEm}</p>
+          <p><strong>Total de análises:</strong> {analises.length}</p>
+        </div>
+      </section>
 
       {/* Histórico */}
-      <section style={{ marginBottom: 40 }}>
-        <h2>Histórico de Análises</h2>
-
+      <section style={styles.section}>
+        <h2 style={styles.sectionTitle}>Histórico de Análises</h2>
         {analises.length === 0 ? (
-          <p style={{ color: "#6b7280", marginTop: 12 }}>
-            Nenhuma análise registrada para esta cliente.
-          </p>
+          <p style={styles.muted}>Nenhuma análise registrada.</p>
         ) : (
-          <div style={{ display: "grid", gap: 16, marginTop: 16 }}>
-            {analises.map((analise) => (
-              <div
-                key={analise.id}
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 10,
-                  padding: 16,
-                  background: "#ffffff",
-                }}
-              >
-                <strong style={{ textTransform: "capitalize" }}>
-                  Análise {analise.tipo}
-                </strong>
-                <p style={{ marginTop: 6 }}>{analise.descricao}</p>
-                <p style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>
-                  {analise.data}
-                </p>
-              </div>
-            ))}
-          </div>
+          analises.map((a) => (
+            <div key={a.id} style={styles.card}>
+              <strong>Análise {a.tipo}</strong>
+              <p>{a.descricao}</p>
+              <span style={styles.small}>{a.data}</span>
+            </div>
+          ))
         )}
       </section>
 
-      {/* Protocolos Inteligentes */}
-      <section>
-        <h2>Protocolos Personalizados Recomendados</h2>
-
-        <div style={{ display: "grid", gap: 20, marginTop: 16 }}>
-          {protocolosGerados.map((protocolo, index) => (
-            <div
-              key={index}
-              style={{
-                border: "1px solid #e5e7eb",
-                borderRadius: 12,
-                padding: 20,
-                background: "#ffffff",
-              }}
-            >
-              <h3>{protocolo.titulo}</h3>
-              <p style={{ marginTop: 8 }}>{protocolo.descricao}</p>
-
-              <ul style={{ marginTop: 12 }}>
-                {protocolo.indicacoes.map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        <p style={{ fontSize: 12, color: "#6b7280", marginTop: 16 }}>
-          Protocolos sugeridos com base no histórico técnico-estético da cliente.
-          A decisão final cabe ao profissional responsável.
+      {/* Protocolos */}
+      <section style={styles.section}>
+        <h2 style={styles.sectionTitle}>Protocolos Recomendados</h2>
+        {protocolosGerados.map((p, i) => (
+          <div key={i} style={styles.card}>
+            <h3 style={styles.protocolTitle}>{p.titulo}</h3>
+            <p>{p.descricao}</p>
+            <ul>
+              {p.indicacoes.map((item, idx) => (
+                <li key={idx}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+        <p style={styles.disclaimer}>
+          Recomendações baseadas no histórico técnico-estético. Decisão final do
+          profissional responsável.
         </p>
       </section>
 
-      <div style={{ marginTop: 40 }}>
+      {/* Rodapé */}
+      <footer style={styles.footer}>
+        <p style={styles.small}>
+          Relatório gerado pelo Hair Analysis System • Uso técnico-profissional
+        </p>
         <button
           onClick={() => navigate("/dashboard")}
-          style={{
-            padding: "10px 18px",
-            borderRadius: 8,
-            border: "none",
-            background: "#047857",
-            color: "#ffffff",
-            cursor: "pointer",
-          }}
+          style={styles.secondaryBtn}
         >
           Retornar ao Dashboard
         </button>
-      </div>
+      </footer>
     </section>
   );
 }
+
+/* ===== Estilos Print-Friendly ===== */
+const styles: Record<string, React.CSSProperties> = {
+  page: {
+    maxWidth: 900,
+    margin: "0 auto",
+    padding: 32,
+    background: "#ffffff",
+    color: "#111827",
+    fontFamily: "Arial, Helvetica, sans-serif",
+  },
+  header: {
+    borderBottom: "2px solid #e5e7eb",
+    paddingBottom: 16,
+    marginBottom: 24,
+  },
+  title: { margin: 0 },
+  subtitle: { color: "#6b7280", marginTop: 6 },
+  section: { marginBottom: 32 },
+  sectionTitle: {
+    borderBottom: "1px solid #e5e7eb",
+    paddingBottom: 6,
+    marginBottom: 12,
+  },
+  card: {
+    border: "1px solid #e5e7eb",
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 12,
+    pageBreakInside: "avoid",
+  },
+  protocolTitle: { marginBottom: 6 },
+  muted: { color: "#6b7280" },
+  small: { fontSize: 12, color: "#6b7280" },
+  disclaimer: { fontSize: 12, color: "#6b7280", marginTop: 8 },
+  footer: {
+    borderTop: "2px solid #e5e7eb",
+    paddingTop: 16,
+    marginTop: 24,
+    textAlign: "center",
+  },
+  primaryBtn: {
+    marginTop: 24,
+    padding: "10px 18px",
+    borderRadius: 6,
+    border: "none",
+    background: "#000080",
+    color: "#ffffff",
+    cursor: "pointer",
+  },
+  secondaryBtn: {
+    marginTop: 12,
+    padding: "8px 16px",
+    borderRadius: 6,
+    border: "1px solid #d1d5db",
+    background: "#ffffff",
+    cursor: "pointer",
+  },
+};
