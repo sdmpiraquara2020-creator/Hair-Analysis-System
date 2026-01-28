@@ -1,196 +1,160 @@
-import { useNavigate } from "react-router-dom";
-import { useAnalysisHistory } from "../context/AnalysisHistoryContext";
-import { useCliente } from "../context/ClienteContext";
+import React from "react";
+import TopBar from "../components/layout/TopBar";
 
-export default function Dashboard() {
-  const navigate = useNavigate();
-  const { historico } = useAnalysisHistory();
-  const { cliente } = useCliente();
-
-  const totalAnalises = historico.length;
-
+const Dashboard: React.FC = () => {
   return (
-    <section style={{ padding: 32, maxWidth: 1200 }}>
-      {/* Cabeçalho */}
-      <header style={{ marginBottom: 24 }}>
-        <h1>Dashboard</h1>
-        <p style={{ color: "#6b7280", maxWidth: 720 }}>
+    <>
+      <TopBar />
+
+      <main
+        style={{
+          padding: "32px",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
+      >
+        <h1 style={{ fontSize: "28px", marginBottom: "8px" }}>Dashboard</h1>
+
+        <p style={{ color: "#6b7280", marginBottom: "32px" }}>
           Painel de acompanhamento do Hair Analysis System. Inicie novas análises
           e acompanhe avaliações recentes realizadas no salão.
         </p>
-      </header>
 
-      {/* Cliente ativo */}
-      <div
-        style={{
-          border: "1px solid #e5e7eb",
-          borderRadius: 12,
-          padding: 20,
-          background: "#ffffff",
-          marginBottom: 32,
-          maxWidth: 720,
-        }}
-      >
-        <strong>Cliente ativa na sessão</strong>
-        <p style={{ color: "#6b7280", marginTop: 6 }}>
-          Atendimento em andamento com histórico vinculado à cliente atual.
-        </p>
-
-        <p style={{ marginTop: 12 }}>
-          <strong>Análises realizadas:</strong>{" "}
-          {totalAnalises === 0 ? "nenhuma até o momento" : totalAnalises}
-        </p>
-
-        <button
-          onClick={() => navigate("/relatorio-cliente")}
-          disabled={!cliente}
-          style={{
-            marginTop: 16,
-            padding: "10px 18px",
-            borderRadius: 8,
-            border: "none",
-            background: cliente ? "#047857" : "#9ca3af",
-            color: "#ffffff",
-            cursor: cliente ? "pointer" : "not-allowed",
-          }}
-        >
-          Ver relatório da cliente
-        </button>
-
-        {!cliente && (
-          <p style={{ fontSize: 12, color: "#6b7280", marginTop: 8 }}>
-            O relatório estará disponível após a realização de uma análise.
-          </p>
-        )}
-      </div>
-
-      {/* Ações principais */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-          gap: 24,
-          marginBottom: 40,
-        }}
-      >
-        {/* Card Tricológica */}
-        <div
+        {/* CLIENTE ATIVO */}
+        <section
           style={{
             border: "1px solid #e5e7eb",
-            borderRadius: 12,
-            padding: 24,
-            background: "#ffffff",
+            borderRadius: "12px",
+            padding: "24px",
+            marginBottom: "32px",
+            background: "#fff",
           }}
         >
-          <h3>Análise Tricológica</h3>
-          <p style={{ color: "#6b7280", margin: "8px 0 20px" }}>
-            Avaliação do couro cabeludo para garantir segurança, saúde capilar e
-            melhores resultados nos procedimentos.
+          <h2 style={{ fontSize: "18px", marginBottom: "8px" }}>
+            Cliente ativa na sessão
+          </h2>
+
+          <p style={{ color: "#6b7280" }}>
+            Atendimento em andamento com histórico vinculado à cliente atual.
+          </p>
+
+          <p style={{ marginTop: "8px" }}>
+            <strong>Análises realizadas:</strong> nenhuma até o momento
           </p>
 
           <button
-            onClick={() => navigate("/analise-tricologica")}
             style={{
-              padding: "10px 18px",
-              borderRadius: 8,
+              marginTop: "16px",
+              padding: "10px 16px",
+              borderRadius: "8px",
               border: "none",
               background: "#047857",
-              color: "#ffffff",
+              color: "#fff",
+              fontWeight: 600,
               cursor: "pointer",
             }}
           >
-            Nova Análise Tricológica
+            Ver relatório da cliente
           </button>
-        </div>
+        </section>
 
-        {/* Card Capilar */}
-        <div
+        {/* GRID DE ANÁLISES */}
+        <section
           style={{
-            border: "1px solid #e5e7eb",
-            borderRadius: 12,
-            padding: 24,
-            background: "#ffffff",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "24px",
+            marginBottom: "32px",
           }}
         >
-          <h3>Análise Capilar</h3>
-          <p style={{ color: "#6b7280", margin: "8px 0 20px" }}>
-            Avaliação do fio para definição de tratamentos, alisamentos e
-            manutenções de forma segura e personalizada.
-          </p>
-
-          <button
-            onClick={() => navigate("/analise-capilar")}
-            style={{
-              padding: "10px 18px",
-              borderRadius: 8,
-              border: "none",
-              background: "#000080",
-              color: "#ffffff",
-              cursor: "pointer",
-            }}
-          >
-            Nova Análise Capilar
-          </button>
-        </div>
-      </div>
-
-      {/* Histórico */}
-      <section>
-        <h2>Atendimentos recentes</h2>
-
-        {historico.length === 0 ? (
+          {/* TRICOLÓGICA */}
           <div
             style={{
-              marginTop: 16,
-              padding: 20,
-              borderRadius: 10,
-              background: "#ffffff",
               border: "1px solid #e5e7eb",
-              maxWidth: 720,
+              borderRadius: "12px",
+              padding: "24px",
+              background: "#fff",
             }}
           >
-            <p style={{ color: "#6b7280" }}>
-              Nenhuma análise registrada ainda. Inicie uma avaliação para começar
-              o acompanhamento da cliente.
+            <h2 style={{ fontSize: "18px", marginBottom: "8px" }}>
+              Análise Tricológica
+            </h2>
+
+            <p style={{ color: "#6b7280", marginBottom: "16px" }}>
+              Avaliação do couro cabeludo para garantir segurança, saúde capilar
+              e melhores resultados nos procedimentos.
             </p>
+
+            <button
+              style={{
+                padding: "10px 16px",
+                borderRadius: "8px",
+                border: "none",
+                background: "#047857",
+                color: "#fff",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Nova Análise Tricológica
+            </button>
           </div>
-        ) : (
+
+          {/* CAPILAR */}
           <div
             style={{
-              display: "grid",
-              gap: 16,
-              marginTop: 16,
-              maxWidth: 900,
+              border: "1px solid #e5e7eb",
+              borderRadius: "12px",
+              padding: "24px",
+              background: "#fff",
             }}
           >
-            {historico.slice(0, 5).map((item, index) => (
-              <div
-                key={index}
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 10,
-                  padding: 16,
-                  background: "#ffffff",
-                }}
-              >
-                <strong style={{ textTransform: "capitalize" }}>
-                  Análise {item.tipo}
-                </strong>
-                <p style={{ marginTop: 6 }}>{item.descricao}</p>
-                <p
-                  style={{
-                    fontSize: 12,
-                    color: "#6b7280",
-                    marginTop: 4,
-                  }}
-                >
-                  {item.data}
-                </p>
-              </div>
-            ))}
+            <h2 style={{ fontSize: "18px", marginBottom: "8px" }}>
+              Análise Capilar
+            </h2>
+
+            <p style={{ color: "#6b7280", marginBottom: "16px" }}>
+              Avaliação do fio para definição de tratamentos, alisamentos e
+              manutenções de forma segura e personalizada.
+            </p>
+
+            <button
+              style={{
+                padding: "10px 16px",
+                borderRadius: "8px",
+                border: "none",
+                background: "#000080",
+                color: "#fff",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Nova Análise Capilar
+            </button>
           </div>
-        )}
-      </section>
-    </section>
+        </section>
+
+        {/* ATENDIMENTOS RECENTES */}
+        <section
+          style={{
+            border: "1px solid #e5e7eb",
+            borderRadius: "12px",
+            padding: "24px",
+            background: "#fff",
+          }}
+        >
+          <h2 style={{ fontSize: "18px", marginBottom: "8px" }}>
+            Atendimentos recentes
+          </h2>
+
+          <p style={{ color: "#6b7280" }}>
+            Nenhuma análise registrada ainda. Inicie uma avaliação para começar
+            o acompanhamento da cliente.
+          </p>
+        </section>
+      </main>
+    </>
   );
-}
+};
+
+export default Dashboard;
