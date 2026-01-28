@@ -1,160 +1,76 @@
-import React from "react";
-import TopBar from "../components/layout/TopBar";
+import { useNavigate } from "react-router-dom";
 
-const Dashboard: React.FC = () => {
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+
+export default function Dashboard() {
+  const navigate = useNavigate();
+
   return (
-    <>
-      <TopBar />
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      <h1 style={{ fontSize: "32px", fontWeight: 700 }}>
+        Dashboard
+      </h1>
 
-      <main
-        style={{
-          padding: "32px",
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-      >
-        <h1 style={{ fontSize: "28px", marginBottom: "8px" }}>Dashboard</h1>
+      <p>
+        Painel de acompanhamento do Hair Analysis System.
+      </p>
 
-        <p style={{ color: "#6b7280", marginBottom: "32px" }}>
-          Painel de acompanhamento do Hair Analysis System. Inicie novas análises
-          e acompanhe avaliações recentes realizadas no salão.
+      {/* Cliente ativo */}
+      <Card title="Cliente ativo na sessão" variant="attention">
+        <p>
+          Atendimento em andamento com histórico vinculado ao cliente atual.
         </p>
 
-        {/* CLIENTE ATIVO */}
-        <section
-          style={{
-            border: "1px solid #e5e7eb",
-            borderRadius: "12px",
-            padding: "24px",
-            marginBottom: "32px",
-            background: "#fff",
-          }}
-        >
-          <h2 style={{ fontSize: "18px", marginBottom: "8px" }}>
-            Cliente ativa na sessão
-          </h2>
+        <p>
+          <strong>Análises realizadas:</strong> nenhuma até o momento
+        </p>
 
-          <p style={{ color: "#6b7280" }}>
-            Atendimento em andamento com histórico vinculado à cliente atual.
+        <Button variant="secondary">
+          Ver Relatório Cliente
+        </Button>
+      </Card>
+
+      {/* Ações */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "16px",
+        }}
+      >
+        <Card title="Análise Tricológica">
+          <p>
+            Avaliação do couro cabeludo para segurança e saúde capilar.
           </p>
 
-          <p style={{ marginTop: "8px" }}>
-            <strong>Análises realizadas:</strong> nenhuma até o momento
+          <Button
+            variant="primary"
+            onClick={() => navigate("/analise-tricologica")}
+          >
+            Nova Análise Tricológica
+          </Button>
+        </Card>
+
+        <Card title="Análise Capilar">
+          <p>
+            Avaliação do fio para tratamentos personalizados.
           </p>
 
-          <button
-            style={{
-              marginTop: "16px",
-              padding: "10px 16px",
-              borderRadius: "8px",
-              border: "none",
-              background: "#047857",
-              color: "#fff",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+          <Button
+            variant="primary"
+            onClick={() => navigate("/analise-capilar")}
           >
-            Ver relatório da cliente
-          </button>
-        </section>
+            Nova Análise Capilar
+          </Button>
+        </Card>
+      </div>
 
-        {/* GRID DE ANÁLISES */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "24px",
-            marginBottom: "32px",
-          }}
-        >
-          {/* TRICOLÓGICA */}
-          <div
-            style={{
-              border: "1px solid #e5e7eb",
-              borderRadius: "12px",
-              padding: "24px",
-              background: "#fff",
-            }}
-          >
-            <h2 style={{ fontSize: "18px", marginBottom: "8px" }}>
-              Análise Tricológica
-            </h2>
-
-            <p style={{ color: "#6b7280", marginBottom: "16px" }}>
-              Avaliação do couro cabeludo para garantir segurança, saúde capilar
-              e melhores resultados nos procedimentos.
-            </p>
-
-            <button
-              style={{
-                padding: "10px 16px",
-                borderRadius: "8px",
-                border: "none",
-                background: "#047857",
-                color: "#fff",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              Nova Análise Tricológica
-            </button>
-          </div>
-
-          {/* CAPILAR */}
-          <div
-            style={{
-              border: "1px solid #e5e7eb",
-              borderRadius: "12px",
-              padding: "24px",
-              background: "#fff",
-            }}
-          >
-            <h2 style={{ fontSize: "18px", marginBottom: "8px" }}>
-              Análise Capilar
-            </h2>
-
-            <p style={{ color: "#6b7280", marginBottom: "16px" }}>
-              Avaliação do fio para definição de tratamentos, alisamentos e
-              manutenções de forma segura e personalizada.
-            </p>
-
-            <button
-              style={{
-                padding: "10px 16px",
-                borderRadius: "8px",
-                border: "none",
-                background: "#000080",
-                color: "#fff",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              Nova Análise Capilar
-            </button>
-          </div>
-        </section>
-
-        {/* ATENDIMENTOS RECENTES */}
-        <section
-          style={{
-            border: "1px solid #e5e7eb",
-            borderRadius: "12px",
-            padding: "24px",
-            background: "#fff",
-          }}
-        >
-          <h2 style={{ fontSize: "18px", marginBottom: "8px" }}>
-            Atendimentos recentes
-          </h2>
-
-          <p style={{ color: "#6b7280" }}>
-            Nenhuma análise registrada ainda. Inicie uma avaliação para começar
-            o acompanhamento da cliente.
-          </p>
-        </section>
-      </main>
-    </>
+      {/* Atendimentos recentes */}
+      <Card title="Atendimentos recentes">
+        <p>Histórico recente de análises realizadas.</p>
+        <p>Nenhuma análise registrada ainda.</p>
+      </Card>
+    </div>
   );
-};
-
-export default Dashboard;
+}

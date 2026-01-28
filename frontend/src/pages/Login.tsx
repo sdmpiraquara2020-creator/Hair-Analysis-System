@@ -1,93 +1,53 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import { loginSalon } from "../services/authApi";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [senha, setSenha] = useState("");
+  const [error, setError] = useState("");
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    // autenticação real entra depois
-    console.log({ email, password });
+  async function handleLogin() {
+    try {
+      const data = await loginSalon(email, senha);
+      login(data);
+      navigate("/dashboard");
+    } catch {
+      setError("Email ou senha inválidos");
+    }
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#f5f5f5",
-      }}
-    >
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          width: 360,
-          padding: 32,
-          backgroundColor: "#ffffff",
-          borderRadius: 8,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-        }}
-      >
-        <h1 style={{ marginBottom: 8 }}>Hair Analysis System</h1>
-        <p style={{ marginBottom: 24, color: "#666" }}>
-          Acesso profissional ao sistema
-        </p>
+    <div style={{ maxWidth: "400px", margin: "80px auto" }}>
+      <Card title="Acesso do Salão">
+        <input
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{ width: "100%", marginBottom: "8px" }}
+        />
 
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: "block", marginBottom: 4 }}>
-            E-mail
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{
-              width: "100%",
-              padding: 10,
-              borderRadius: 4,
-              border: "1px solid #ccc",
-            }}
-          />
-        </div>
+        <input
+          placeholder="Senha"
+          type="password"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+          style={{ width: "100%", marginBottom: "8px" }}
+        />
 
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ display: "block", marginBottom: 4 }}>
-            Senha
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{
-              width: "100%",
-              padding: 10,
-              borderRadius: 4,
-              border: "1px solid #ccc",
-            }}
-          />
-        </div>
+        {error && <p style={{ color: "red" }}>{error}</p>}
 
-        <button
-          type="submit"
-          style={{
-            width: "100%",
-            padding: 12,
-            borderRadius: 4,
-            border: "none",
-            backgroundColor: "#111",
-            color: "#fff",
-            fontWeight: 500,
-            cursor: "pointer",
-          }}
-        >
+        <Button variant="primary" onClick={handleLogin}>
           Entrar
-        </button>
-      </form>
+        </Button>
+      </Card>
     </div>
   );
 }

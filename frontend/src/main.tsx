@@ -1,18 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import App from "./App";
-import { ClienteProvider } from "./context/ClienteContext";
-import { AnalysisHistoryProvider } from "./context/AnalysisHistoryContext";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+import App from "./App";
+import { AuthProvider } from "./context/AuthContext";
+
+ReactDOM.createRoot(
+  document.getElementById("root") as HTMLElement
+).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <ClienteProvider>
-        <AnalysisHistoryProvider>
-          <App />
-        </AnalysisHistoryProvider>
-      </ClienteProvider>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </AuthProvider>
   </React.StrictMode>
 );

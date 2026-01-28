@@ -1,0 +1,128 @@
+.clientes-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.btn-voltar {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 24px;
+}
+
+.clientes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.clientes-header h1 {
+  margin: 0;
+}
+
+.clientes-total {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.clientes-busca {
+  width: 320px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+.clientes-table-wrapper {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.clientes-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.clientes-table thead {
+  background: #f9fafb;
+}
+
+.clientes-table th {
+  text-align: left;
+  padding: 14px;
+  font-size: 13px;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.clientes-table td {
+  padding: 14px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.clientes-table tr:hover {
+  background: #f9fafb;
+}
+
+.cliente-nome {
+  font-weight: 600;
+}
+
+.acoes {
+  display: flex;
+  gap: 10px;
+}
+
+.acao {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  cursor: pointer;
+}
+
+.acao.selecionar {
+  background: #e0f2fe;
+}
+
+.acao.editar {
+  background: #eef2ff;
+}
+
+.acao.excluir {
+  background: #fee2e2;
+}
+
+.vazio {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+}
+
+.paginacao {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.paginacao button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
+}
+
+.paginacao button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

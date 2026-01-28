@@ -1,63 +1,46 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { loginRequest } from "../api/auth.api";
-import api from "../api";
+import { createContext, useContext, useState } from "react";
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
+export interface AuthData {
+  token: string;
+  salonId: string;
+  nome: string;
 }
 
-interface AuthContextData {
-  user: User | null;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+interface AuthContextType {
+  auth: AuthData | null;
+  login: (data: AuthData) => void;
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [auth, setAuth] = useState<AuthData | null>(() => {
+    const raw = localStorage.getItem("auth");
+    return raw ? JSON.parse(raw) : null;
+  });
 
-  useEffect(() => {
-    const token = localStorage.getItem("@sdm:token");
-    const userData = localStorage.getItem("@sdm:user");
-
-    if (token && userData) {
-      api.defaults.headers.common.Authorization = `Bearer ${token}`;
-      setUser(JSON.parse(userData));
-    }
-
-    setLoading(false);
-  }, []);
-
-  async function login(email: string, password: string) {
-    const { user, token } = await loginRequest({ email, password });
-
-    localStorage.setItem("@sdm:token", token);
-    localStorage.setItem("@sdm:user", JSON.stringify(user));
-
-    api.defaults.headers.common.Authorization = `Bearer ${token}`;
-    setUser(user);
+  function login(data: AuthData) {
+    setAuth(data);
+    localStorage.setItem("auth", JSON.stringify(data));
   }
 
   function logout() {
-    localStorage.removeItem("@sdm:token");
-    localStorage.removeItem("@sdm:user");
-    setUser(null);
-    delete api.defaults.headers.common.Authorization;
+    setAuth(null);
+    localStorage.removeItem("auth");
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ auth, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth deve ser usado dentro de AuthProvider");
+  }
+  return context;
 }

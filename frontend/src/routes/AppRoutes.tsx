@@ -1,27 +1,40 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
+import AppLayout from "../layouts/AppLayout";
+import PrivateRoute from "./PrivateRoute";
+
+import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import AnaliseCapilar from "../pages/AnaliseCapilar";
 import AnaliseTricologica from "../pages/AnaliseTricologica";
-import RelatorioCliente from "../pages/RelatorioCliente";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" />} />
+      {/* Rota pública */}
+      <Route path="/login" element={<Login />} />
 
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/analise-capilar" element={<AnaliseCapilar />} />
-      <Route path="/analise-tricologica" element={<AnaliseTricologica />} />
-
-      {/* FASE 4 — Relatório da Cliente */}
+      {/* Rotas protegidas */}
       <Route
-        path="/relatorio-cliente"
-        element={<RelatorioCliente />}
-      />
+        element={
+          <PrivateRoute>
+            <AppLayout />
+          </PrivateRoute>
+        }
+      >
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+
+        {/* ANÁLISES */}
+        <Route path="/analise-capilar" element={<AnaliseCapilar />} />
+        <Route
+          path="/analise-tricologica"
+          element={<AnaliseTricologica />}
+        />
+      </Route>
 
       {/* fallback */}
-      <Route path="*" element={<Navigate to="/dashboard" />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }

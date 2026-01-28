@@ -1,16 +1,30 @@
 import { Outlet } from "react-router-dom";
+import TopBar from "../components/layout/TopBar";
 
 export default function AppLayout() {
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      {/* SIDEBAR */}
-      <aside style={{ width: 240 }}>
-        {/* menu lateral */}
-      </aside>
+    <div className="app-layout">
+      <TopBar />
 
-      {/* CONTEÚDO */}
-      <main style={{ flex: 1, padding: 24 }}>
-        <Outlet />
+      <main
+        className="app-content"
+        style={{
+          paddingTop: "64px",          // espaço da TopBar
+          backgroundColor: "#F8FAFC",  // fundo técnico neutro
+          minHeight: "100vh",
+        }}
+      >
+        {/* Container padrão do sistema */}
+        <div
+          className="content-container"
+          style={{
+            maxWidth: "1280px",
+            margin: "0 auto",
+            padding: "24px",
+          }}
+        >
+          <Outlet />
+        </div>
       </main>
     </div>
   );

@@ -1,45 +1,22 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import "./TopBar.css";
-
-const TopBar: React.FC = () => {
-  const navigate = useNavigate();
-
+export default function TopBar() {
   return (
-    <header className="topbar">
-      {/* LADO ESQUERDO */}
-      <div className="topbar-left">
-        <img
-          src="/Sistema-de-Análise-Capilar.png"
-          alt="Hair Analysis System"
-          style={{ height: "60px" }}
-        />
-
-        <span className="topbar-subtitle">Sistema Inteligente</span>
-      </div>
-
-      {/* LADO DIREITO */}
-      <div className="topbar-right">
-        <button
-          className="notification-button"
-          onClick={() => navigate("/clientes/novo")}
-        >
-          + Cliente
-        </button>
-
-        <div className="topbar-separator" />
-
-        <div className="user-profile">
-          <div className="user-avatar">HAS</div>
-
-          <div className="user-info">
-            <div className="user-name">Profissional</div>
-            <div className="user-role">Salão</div>
-          </div>
-        </div>
-      </div>
+    <header
+      className="topbar"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        height: "64px",
+        backgroundColor: "#ffffff",
+        borderBottom: "1px solid #e5e7eb",
+        display: "flex",
+        alignItems: "center",
+        padding: "0 16px",
+        zIndex: 1000,
+      }}
+    >
+      TopBar
     </header>
   );
-};
-
-export default TopBar;
+}
