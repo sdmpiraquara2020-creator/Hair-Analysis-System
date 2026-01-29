@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useMemo } from "react";
 
 export interface AuthData {
   token: string;
@@ -8,6 +8,7 @@ export interface AuthData {
 
 interface AuthContextType {
   auth: AuthData | null;
+  isAuthenticated: boolean;
   login: (data: AuthData) => void;
   logout: () => void;
 }
@@ -30,8 +31,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("auth");
   }
 
+  /**
+   * ✅ Estado DERIVADO e ESTÁVEL
+   * Nunca valide rota diretamente com `auth`
+   */
+  const isAuthenticated = useMemo(() => {
+    return Boolean(auth?.token);
+  }, [auth]);
+
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        auth,
+        isAuthenticated,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

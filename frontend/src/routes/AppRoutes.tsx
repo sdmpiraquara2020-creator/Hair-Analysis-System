@@ -1,40 +1,70 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-
-import AppLayout from "../layouts/AppLayout";
+import { useAuth } from "../context/AuthContext";
 import PrivateRoute from "./PrivateRoute";
 
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
-import AnaliseCapilar from "../pages/AnaliseCapilar";
 import AnaliseTricologica from "../pages/AnaliseTricologica";
+import AnaliseCapilar from "../pages/AnaliseCapilar";
 
 export default function AppRoutes() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <Routes>
-      {/* Rota pública */}
-      <Route path="/login" element={<Login />} />
-
-      {/* Rotas protegidas */}
+      {/* Login */}
       <Route
+        path="/login"
+        element={
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
+        }
+      />
+
+      {/* Dashboard */}
+      <Route
+        path="/dashboard"
         element={
           <PrivateRoute>
-            <AppLayout />
+            <Dashboard />
           </PrivateRoute>
         }
-      >
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+      />
 
-        {/* ANÁLISES */}
-        <Route path="/analise-capilar" element={<AnaliseCapilar />} />
-        <Route
-          path="/analise-tricologica"
-          element={<AnaliseTricologica />}
-        />
-      </Route>
+      {/* Análise Tricológica */}
+      <Route
+        path="/analise-tricologica"
+        element={
+          <PrivateRoute>
+            <AnaliseTricologica />
+          </PrivateRoute>
+        }
+      />
 
-      {/* fallback */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      {/* Análise Capilar */}
+      <Route
+        path="/analise-capilar"
+        element={
+          <PrivateRoute>
+            <AnaliseCapilar />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Rota raiz */}
+      <Route
+        path="/"
+        element={
+          <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />
+        }
+      />
+
+      {/* Fallback */}
+      <Route
+        path="*"
+        element={
+          <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />
+        }
+      />
     </Routes>
   );
 }

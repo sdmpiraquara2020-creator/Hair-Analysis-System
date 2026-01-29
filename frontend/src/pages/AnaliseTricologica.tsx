@@ -1,103 +1,110 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import ImageCapture from "../components/vision/ImageCapture";
+import { useAuth } from "../context/AuthContext";
 
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import { avaliarAnaliseTricologica } from "../engine/analiseTricologicaHeuristica";
+const API = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
 export default function AnaliseTricologica() {
-  const navigate = useNavigate();
+  const { auth } = useAuth();
 
-  const [oleosidade, setOleosidade] = useState<string[]>([]);
-  const [condicoes, setCondicoes] = useState<string[]>([]);
-  const [sensacoes, setSensacoes] = useState<string[]>([]);
-  const [observacoes, setObservacoes] = useState("");
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [status, setStatus] = useState<string>("Iniciando sessão...");
 
-  function toggle(list: string[], value: string, set: Function) {
-    set(
-      list.includes(value)
-        ? list.filter((v) => v !== value)
-        : [...list, value]
-    );
+  // Inicia sessão ao entrar na tela
+  useEffect(() => {
+    async function startSession() {
+      try {
+        const response = await fetch(`${API}/vision/session/start`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth?.token}`,
+          },
+          body: JSON.stringify({
+            clientId: "cliente_demo", // depois vem do fluxo real
+            type: "tricologica",
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Erro ao iniciar sessão");
+        }
+
+        const data = await response.json();
+        setSessionId(data.id);
+        setStatus("Sessão tricológica iniciada. Capture a imagem.");
+      } catch (error) {
+        console.error(error);
+        setStatus("Erro ao iniciar sessão tricológica.");
+      }
+    }
+
+    if (auth?.token) {
+      startSession();
+    }
+  }, [auth]);
+
+  async function handleCapture(file: File) {
+    if (!sessionId) return;
+
+    setStatus("Enviando imagem do couro cabeludo...");
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("sessionId", sessionId);
+
+    try {
+      const response = await fetch(`${API}/vision/upload`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${auth?.token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro no upload");
+      }
+
+      setStatus("Imagem enviada com sucesso.");
+    } catch (error) {
+      console.error(error);
+      setStatus("Erro ao enviar imagem.");
+    }
   }
 
-  function handleAvancar() {
-    const resultado = avaliarAnaliseTricologica({
-      oleosidade,
-      condicoes,
-      sensacoes,
-      observacoes,
-    });
+  async function endSession() {
+    if (!sessionId) return;
 
-    sessionStorage.setItem(
-      "resultadoAnaliseTricologica",
-      JSON.stringify(resultado)
-    );
+    try {
+      await fetch(`${API}/vision/session/end`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth?.token}`,
+        },
+        body: JSON.stringify({ sessionId }),
+      });
 
-    navigate("/resultado-analise-tricologica");
+      setStatus("Sessão tricológica finalizada.");
+    } catch (error) {
+      console.error(error);
+      setStatus("Erro ao finalizar sessão.");
+    }
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      <h1 style={{ fontSize: "32px", fontWeight: 700 }}>
-        Análise Tricológica
-      </h1>
+    <div style={{ padding: 24 }}>
+      <h1>Análise Tricológica</h1>
+      <p>Status: {status}</p>
 
-      <Card title="Oleosidade do couro cabeludo">
-        {["Oleosidade elevada", "Oleosidade equilibrada", "Oleosidade baixa"].map(
-          (v) => (
-            <label key={v}>
-              <input
-                type="checkbox"
-                onChange={() => toggle(oleosidade, v, setOleosidade)}
-              />{" "}
-              {v}
-            </label>
-          )
-        )}
-      </Card>
+      {sessionId && <ImageCapture onCapture={handleCapture} />}
 
-      <Card title="Condições observadas" variant="attention">
-        {["Descamação visível", "Vermelhidão", "Sensibilidade relatada"].map(
-          (v) => (
-            <label key={v}>
-              <input
-                type="checkbox"
-                onChange={() => toggle(condicoes, v, setCondicoes)}
-              />{" "}
-              {v}
-            </label>
-          )
-        )}
-      </Card>
-
-      <Card title="Sensações relatadas pela cliente">
-        {["Queda percebida", "Coceira frequente"].map((v) => (
-          <label key={v}>
-            <input
-              type="checkbox"
-              onChange={() => toggle(sensacoes, v, setSensacoes)}
-            />{" "}
-            {v}
-          </label>
-        ))}
-      </Card>
-
-      <Card title="Observações do profissional">
-        <textarea
-          value={observacoes}
-          onChange={(e) => setObservacoes(e.target.value)}
-          rows={4}
-          style={{ width: "100%" }}
-        />
-      </Card>
-
-      <div style={{ display: "flex", gap: "12px" }}>
-        <Button variant="secondary">Salvar Análise</Button>
-        <Button variant="primary" onClick={handleAvancar}>
-          Avançar para Resultado
-        </Button>
-      </div>
+      {sessionId && (
+        <button style={{ marginTop: 16 }} onClick={endSession}>
+          Finalizar Sessão
+        </button>
+      )}
     </div>
   );
 }
