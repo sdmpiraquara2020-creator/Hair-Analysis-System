@@ -1,51 +1,87 @@
-import { createContext, useContext, useState, useMemo } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+import api from "../services/api";
 
-export interface AuthData {
-  token: string;
+interface User {
+  id: string;
+  name: string;
+  email: string;
   salonId: string;
-  nome: string;
 }
 
-interface AuthContextType {
-  auth: AuthData | null;
-  isAuthenticated: boolean;
-  login: (data: AuthData) => void;
-  logout: () => void;
+interface AuthContextData {
+  user: User | null;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [auth, setAuth] = useState<AuthData | null>(() => {
-    const raw = localStorage.getItem("auth");
-    return raw ? JSON.parse(raw) : null;
-  });
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  function login(data: AuthData) {
-    setAuth(data);
-    localStorage.setItem("auth", JSON.stringify(data));
+  useEffect(() => {
+    const storedUser = localStorage.getItem("@HAS:user");
+    const token = localStorage.getItem("@HAS:token");
+
+    if (storedUser && token) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+
+      api.defaults.headers.Authorization = `Bearer ${token}`;
+      api.defaults.params = {
+        ...api.defaults.params,
+        salonId: parsedUser.salonId,
+      };
+    }
+
+    setLoading(false);
+  }, []);
+
+  async function signIn(email: string, password: string) {
+    const response = await api.post("/auth/login", {
+      email,
+      password,
+    });
+
+    const { token, user } = response.data;
+
+    localStorage.setItem("@HAS:user", JSON.stringify(user));
+    localStorage.setItem("@HAS:token", token);
+
+    api.defaults.headers.Authorization = `Bearer ${token}`;
+    api.defaults.params = {
+      ...api.defaults.params,
+      salonId: user.salonId,
+    };
+
+    setUser(user);
   }
 
-  function logout() {
-    setAuth(null);
-    localStorage.removeItem("auth");
-  }
+  function signOut() {
+    localStorage.removeItem("@HAS:user");
+    localStorage.removeItem("@HAS:token");
 
-  /**
-   * ✅ Estado DERIVADO e ESTÁVEL
-   * Nunca valide rota diretamente com `auth`
-   */
-  const isAuthenticated = useMemo(() => {
-    return Boolean(auth?.token);
-  }, [auth]);
+    delete api.defaults.headers.Authorization;
+    delete api.defaults.params?.salonId;
+
+    setUser(null);
+  }
 
   return (
     <AuthContext.Provider
       value={{
-        auth,
-        isAuthenticated,
-        login,
-        logout,
+        user,
+        loading,
+        signIn,
+        signOut,
       }}
     >
       {children}
@@ -54,9 +90,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth deve ser usado dentro de AuthProvider");
-  }
-  return context;
+  return useContext(AuthContext);
 }

@@ -6,6 +6,7 @@ import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import AnaliseTricologica from "../pages/AnaliseTricologica";
 import AnaliseCapilar from "../pages/AnaliseCapilar";
+import HistoryPage from "../pages/HistoryPage";
 
 export default function AppRoutes() {
   const { isAuthenticated } = useAuth();
@@ -46,6 +47,16 @@ export default function AppRoutes() {
         element={
           <PrivateRoute>
             <AnaliseCapilar />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Histórico de Análises */}
+      <Route
+        path="/historico"
+        element={
+          <PrivateRoute>
+            <HistoryPage />
           </PrivateRoute>
         }
       />
