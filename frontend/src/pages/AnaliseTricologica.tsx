@@ -1,16 +1,25 @@
 import { useEffect, useState } from "react";
 import ImageCapture from "../components/vision/ImageCapture";
 import { useAuth } from "../context/AuthContext";
+import Card from "../components/ui/Card";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
+
+interface AnalysisResult {
+  score: number;
+  flags: string[];
+  signals: Record<string, string>;
+  interpretation: string;
+}
 
 export default function AnaliseTricologica() {
   const { auth } = useAuth();
 
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [status, setStatus] = useState<string>("Iniciando sessão...");
+  const [status, setStatus] = useState("Iniciando sessão...");
+  const [preview, setPreview] = useState<string | null>(null);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
 
-  // Inicia sessão ao entrar na tela
   useEffect(() => {
     async function startSession() {
       try {
@@ -21,89 +30,110 @@ export default function AnaliseTricologica() {
             Authorization: `Bearer ${auth?.token}`,
           },
           body: JSON.stringify({
-            clientId: "cliente_demo", // depois vem do fluxo real
+            clientId: "cliente_demo",
             type: "tricologica",
           }),
         });
 
-        if (!response.ok) {
-          throw new Error("Erro ao iniciar sessão");
-        }
-
         const data = await response.json();
         setSessionId(data.id);
         setStatus("Sessão tricológica iniciada. Capture a imagem.");
-      } catch (error) {
-        console.error(error);
-        setStatus("Erro ao iniciar sessão tricológica.");
+      } catch {
+        setStatus("Erro ao iniciar sessão.");
       }
     }
 
-    if (auth?.token) {
-      startSession();
-    }
+    if (auth?.token) startSession();
   }, [auth]);
 
   async function handleCapture(file: File) {
     if (!sessionId) return;
 
-    setStatus("Enviando imagem do couro cabeludo...");
+    setPreview(URL.createObjectURL(file));
+    setStatus("Processando análise...");
 
     const formData = new FormData();
     formData.append("file", file);
     formData.append("sessionId", sessionId);
+    formData.append("type", "tricologica");
 
-    try {
-      const response = await fetch(`${API}/vision/upload`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${auth?.token}`,
-        },
-        body: formData,
-      });
+    const response = await fetch(`${API}/vision/upload`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${auth?.token}`,
+      },
+      body: formData,
+    });
 
-      if (!response.ok) {
-        throw new Error("Erro no upload");
-      }
+    const data = await response.json();
 
-      setStatus("Imagem enviada com sucesso.");
-    } catch (error) {
-      console.error(error);
-      setStatus("Erro ao enviar imagem.");
-    }
+    // 🔒 NORMALIZAÇÃO SEGURA
+    const normalizedResult: AnalysisResult = {
+      score: Number(data.score) || 0,
+      flags: Array.isArray(data.flags) ? data.flags : [],
+      signals: data.signals || {},
+      interpretation: data.interpretation || "",
+    };
+
+    setResult(normalizedResult);
+    setStatus("Análise concluída.");
   }
 
-  async function endSession() {
-    if (!sessionId) return;
-
-    try {
-      await fetch(`${API}/vision/session/end`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth?.token}`,
-        },
-        body: JSON.stringify({ sessionId }),
-      });
-
-      setStatus("Sessão tricológica finalizada.");
-    } catch (error) {
-      console.error(error);
-      setStatus("Erro ao finalizar sessão.");
-    }
-  }
+  const cardVariant =
+    result?.flags?.includes("alert")
+      ? "alert"
+      : result?.flags?.includes("attention")
+      ? "attention"
+      : "default";
 
   return (
-    <div style={{ padding: 24 }}>
-      <h1>Análise Tricológica</h1>
-      <p>Status: {status}</p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-text-main">
+          Análise Tricológica
+        </h1>
+        <p className="text-text-muted">Status: {status}</p>
+      </div>
 
       {sessionId && <ImageCapture onCapture={handleCapture} />}
 
-      {sessionId && (
-        <button style={{ marginTop: 16 }} onClick={endSession}>
-          Finalizar Sessão
-        </button>
+      {preview && (
+        <Card title="Imagem analisada">
+          <img
+            src={preview}
+            alt="Pré-visualização"
+            className="max-h-64 rounded-md border"
+          />
+        </Card>
+      )}
+
+      {result && (
+        <Card title="Resultado da Análise" variant={cardVariant}>
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-text-muted">Score Técnico</p>
+              <p className="text-3xl font-bold text-primary">
+                {result.score}/100
+              </p>
+            </div>
+
+            <div>
+              <p className="font-semibold">Sinais detectados:</p>
+              <ul className="list-disc ml-5 text-sm">
+                {Object.entries(result.signals).map(([key, value]) => (
+                  <li key={key}>
+                    {key}: {value}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-semibold">Interpretação profissional:</p>
+              <p className="text-text-main">{result.interpretation}</p>
+            </div>
+          </div>
+        </Card>
       )}
     </div>
   );

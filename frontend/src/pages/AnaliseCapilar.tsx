@@ -1,16 +1,36 @@
 import { useEffect, useState } from "react";
 import ImageCapture from "../components/vision/ImageCapture";
 import { useAuth } from "../context/AuthContext";
+import Card from "../components/ui/Card";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
+const HISTORY_KEY = "has_capilar_history";
+
+interface AnalysisResult {
+  score: number;
+  flags: string[];
+  signals: Record<string, string>;
+  interpretation: string;
+  date: string;
+}
 
 export default function AnaliseCapilar() {
   const { auth } = useAuth();
 
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [status, setStatus] = useState<string>("Iniciando sessão...");
+  const [status, setStatus] = useState("Iniciando sessão...");
+  const [preview, setPreview] = useState<string | null>(null);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [history, setHistory] = useState<AnalysisResult[]>([]);
 
-  // Inicia sessão ao entrar na tela
+  // Carregar histórico local
+  useEffect(() => {
+    const stored = localStorage.getItem(HISTORY_KEY);
+    if (stored) {
+      setHistory(JSON.parse(stored));
+    }
+  }, []);
+
   useEffect(() => {
     async function startSession() {
       try {
@@ -21,89 +41,127 @@ export default function AnaliseCapilar() {
             Authorization: `Bearer ${auth?.token}`,
           },
           body: JSON.stringify({
-            clientId: "cliente_demo", // depois vem do fluxo real
+            clientId: "cliente_demo",
             type: "capilar",
           }),
         });
 
-        if (!response.ok) {
-          throw new Error("Erro ao iniciar sessão");
-        }
-
         const data = await response.json();
         setSessionId(data.id);
         setStatus("Sessão capilar iniciada. Capture a imagem do fio.");
-      } catch (error) {
-        console.error(error);
-        setStatus("Erro ao iniciar sessão capilar.");
+      } catch {
+        setStatus("Erro ao iniciar sessão.");
       }
     }
 
-    if (auth?.token) {
-      startSession();
-    }
+    if (auth?.token) startSession();
   }, [auth]);
 
   async function handleCapture(file: File) {
     if (!sessionId) return;
 
-    setStatus("Enviando imagem do fio...");
+    setPreview(URL.createObjectURL(file));
+    setStatus("Processando análise capilar...");
 
     const formData = new FormData();
     formData.append("file", file);
     formData.append("sessionId", sessionId);
+    formData.append("type", "capilar");
 
-    try {
-      const response = await fetch(`${API}/vision/upload`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${auth?.token}`,
-        },
-        body: formData,
-      });
+    const response = await fetch(`${API}/vision/upload`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${auth?.token}`,
+      },
+      body: formData,
+    });
 
-      if (!response.ok) {
-        throw new Error("Erro no upload");
-      }
+    const data = await response.json();
 
-      setStatus("Imagem capilar enviada com sucesso.");
-    } catch (error) {
-      console.error(error);
-      setStatus("Erro ao enviar imagem.");
-    }
+    const normalized: AnalysisResult = {
+      score: Number(data.score) || 0,
+      flags: Array.isArray(data.flags) ? data.flags : [],
+      signals: data.signals || {},
+      interpretation: data.interpretation || "",
+      date: new Date().toLocaleString(),
+    };
+
+    const updatedHistory = [normalized, ...history];
+
+    setResult(normalized);
+    setHistory(updatedHistory);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(updatedHistory));
+
+    setStatus("Análise capilar concluída.");
   }
 
-  async function endSession() {
-    if (!sessionId) return;
-
-    try {
-      await fetch(`${API}/vision/session/end`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${auth?.token}`,
-        },
-        body: JSON.stringify({ sessionId }),
-      });
-
-      setStatus("Sessão capilar finalizada.");
-    } catch (error) {
-      console.error(error);
-      setStatus("Erro ao finalizar sessão.");
-    }
-  }
+  const cardVariant =
+    result?.flags?.includes("alert")
+      ? "alert"
+      : result?.flags?.includes("attention")
+      ? "attention"
+      : "default";
 
   return (
-    <div style={{ padding: 24 }}>
-      <h1>Análise Capilar</h1>
-      <p>Status: {status}</p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-text-main">
+          Análise Capilar
+        </h1>
+        <p className="text-text-muted">Status: {status}</p>
+      </div>
 
       {sessionId && <ImageCapture onCapture={handleCapture} />}
 
-      {sessionId && (
-        <button style={{ marginTop: 16 }} onClick={endSession}>
-          Finalizar Sessão
-        </button>
+      {preview && (
+        <Card title="Imagem analisada">
+          <img
+            src={preview}
+            alt="Pré-visualização"
+            className="max-h-64 rounded-md border"
+          />
+        </Card>
+      )}
+
+      {result && (
+        <Card title="Resultado da Análise Capilar" variant={cardVariant}>
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-text-muted">Score Capilar</p>
+              <p className="text-3xl font-bold text-primary">
+                {result.score}/100
+              </p>
+            </div>
+
+            <div>
+              <p className="font-semibold">Sinais detectados:</p>
+              <ul className="list-disc ml-5 text-sm">
+                {Object.entries(result.signals).map(([key, value]) => (
+                  <li key={key}>
+                    {key}: {value}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-semibold">Interpretação profissional:</p>
+              <p className="text-text-main">{result.interpretation}</p>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {history.length > 1 && (
+        <Card title="Histórico de Análises Capilares">
+          <ul className="space-y-2 text-sm">
+            {history.slice(1).map((item, index) => (
+              <li key={index} className="border-b pb-2">
+                <strong>{item.date}</strong> — Score: {item.score}
+              </li>
+            ))}
+          </ul>
+        </Card>
       )}
     </div>
   );

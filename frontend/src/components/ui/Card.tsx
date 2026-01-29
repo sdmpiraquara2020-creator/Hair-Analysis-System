@@ -10,16 +10,10 @@ interface CardProps {
   variant?: CardVariant;
 }
 
-const variantStyles: Record<CardVariant, React.CSSProperties> = {
-  default: {
-    borderLeft: "4px solid #2563EB", // azul técnico
-  },
-  attention: {
-    borderLeft: "4px solid #D97706", // âmbar
-  },
-  alert: {
-    borderLeft: "4px solid #DC2626", // vermelho
-  },
+const variantBorderClasses: Record<CardVariant, string> = {
+  default: "border-l-primary",
+  attention: "border-l-secondary",
+  alert: "border-l-status-error",
 };
 
 export default function Card({
@@ -31,39 +25,28 @@ export default function Card({
 }: CardProps) {
   return (
     <div
-      style={{
-        backgroundColor: "#FFFFFF",
-        borderRadius: "12px",
-        border: "1px solid #E5E7EB",
-        padding: "20px",
-        ...variantStyles[variant],
-      }}
+      className={[
+        "bg-surface rounded-xl border border-border border-l-4 p-5 shadow-card",
+        variantBorderClasses[variant],
+      ].join(" ")}
     >
-      <div style={{ marginBottom: "12px" }}>
-        <h3
-          style={{
-            fontSize: "18px",
-            fontWeight: 600,
-            margin: 0,
-          }}
-        >
+      <div className="mb-3">
+        <h3 className="text-lg font-semibold text-text-main">
           {title}
         </h3>
 
         {description && (
-          <p
-            style={{
-              marginTop: "6px",
-              color: "#4B5563",
-              fontSize: "14px",
-            }}
-          >
+          <p className="mt-1 text-sm text-text-muted">
             {description}
           </p>
         )}
       </div>
 
-      {children && <div style={{ marginBottom: action ? "16px" : 0 }}>{children}</div>}
+      {children && (
+        <div className={action ? "mb-4" : undefined}>
+          {children}
+        </div>
+      )}
 
       {action && <div>{action}</div>}
     </div>

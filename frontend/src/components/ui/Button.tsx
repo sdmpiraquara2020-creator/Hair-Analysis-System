@@ -6,44 +6,35 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
 }
 
-const variantStyles: Record<ButtonVariant, React.CSSProperties> = {
-  primary: {
-    backgroundColor: "#2563EB",
-    color: "#FFFFFF",
-    border: "1px solid #2563EB",
-  },
-  secondary: {
-    backgroundColor: "#FFFFFF",
-    color: "#2563EB",
-    border: "1px solid #2563EB",
-  },
-  ghost: {
-    backgroundColor: "transparent",
-    color: "#2563EB",
-    border: "1px solid transparent",
-  },
+const baseClasses =
+  "inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2";
+
+const variantClasses: Record<ButtonVariant, string> = {
+  primary:
+    "bg-primary text-white border border-primary hover:bg-primary-dark focus:ring-primary",
+  secondary:
+    "bg-white text-primary border border-primary hover:bg-primary/10 focus:ring-primary",
+  ghost:
+    "bg-transparent text-primary border border-transparent hover:bg-primary/10 focus:ring-primary",
 };
 
 export default function Button({
   variant = "primary",
   disabled,
   children,
+  className = "",
   ...props
 }: ButtonProps) {
   return (
     <button
       {...props}
       disabled={disabled}
-      style={{
-        padding: "10px 16px",
-        borderRadius: "8px",
-        fontSize: "14px",
-        fontWeight: 600,
-        cursor: disabled ? "not-allowed" : "pointer",
-        opacity: disabled ? 0.6 : 1,
-        transition: "all 0.2s ease",
-        ...variantStyles[variant],
-      }}
+      className={[
+        baseClasses,
+        variantClasses[variant],
+        disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer",
+        className,
+      ].join(" ")}
     >
       {children}
     </button>
