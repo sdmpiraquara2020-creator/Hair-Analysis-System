@@ -19,7 +19,7 @@ export default function Login() {
       const data = await loginSalon(email, senha);
       login(data);
       navigate("/dashboard");
-    } catch {
+    } catch (err) {
       setError("Email ou senha inválidos");
     }
   }
